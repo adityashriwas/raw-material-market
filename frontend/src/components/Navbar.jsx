@@ -77,7 +77,11 @@ const Navbar = () => {
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem asChild>
-                    <Link to="/my-learning">Added Products</Link>
+                    <Link to="/all-products">All Products</Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link to="/add-product">Add Product</Link>
                   </DropdownMenuItem>
 
                   <DropdownMenuItem onClick={logoutHandler}>

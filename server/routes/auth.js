@@ -242,25 +242,11 @@ router.post('/login', [
 // @access  Private
 router.get('/getuser', auth, async (req, res) => {
   try {
-    const userId = req.id;
-    const user = await User.findById(userId)
-      .select("-password");
-    if (!user) {
-      return res.status(404).json({
-        message: "Profile not found",
-        success: false,
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      user,
-    });
+    const user = await User.findById(req.user.id);
+    res.json({ user });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to load user",
-    });
+    console.error('Get user error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

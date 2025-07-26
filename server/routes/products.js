@@ -26,7 +26,7 @@ const router = express.Router();
 // @route   GET /api/products
 // @desc    Get all products with filtering and pagination
 // @access  Public
-router.get('/', [
+router.get('/all-products', [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('minPrice').optional().isFloat({ min: 0 }).withMessage('Min price must be a positive number'),
@@ -136,13 +136,15 @@ router.get('/:id', async (req, res) => {
 // @route   POST /api/products
 // @desc    Create a new product
 // @access  Private (Suppliers only)
-router.post('/', [
+router.post('/post-product', [
   auth,
   authorize('supplier', 'admin'),
-  upload.array('images', 5), // Allow up to 5 images
+  upload.array('images', 5), // up to 5 images
   body('name').notEmpty().withMessage('Product name is required'),
   body('description').notEmpty().withMessage('Product description is required'),
-  body('category').isMongoId().withMessage('Valid category ID is required'),
+  body('category')
+    .isIn(['Vegetables', 'Fruits', 'Grains', 'Dairy', 'Meat', 'Seafood', 'Beverages', 'Snacks', 'Condiments', 'Spices'])
+    .withMessage('Category must be one of the predefined options'),
   body('pricing.basePrice').isFloat({ min: 0 }).withMessage('Base price must be a positive number'),
   body('pricing.unit').notEmpty().withMessage('Unit is required'),
   body('pricing.minimumOrderQuantity').isInt({ min: 1 }).withMessage('Minimum order quantity must be at least 1'),
@@ -158,7 +160,6 @@ router.post('/', [
       return res.status(400).json({ message: 'At least one image is required' });
     }
 
-    // Upload images to cloudinary
     const uploadPromises = req.files.map(file => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -174,23 +175,15 @@ router.post('/', [
 
     const imageUrls = await Promise.all(uploadPromises);
 
-    // Verify category exists
-    const category = await Category.findById(req.body.category);
-    if (!category) {
-      return res.status(400).json({ message: 'Category not found' });
-    }
-
-    // Create product
     const product = new Product({
       ...req.body,
-      supplier: req.user.id,
-      images: imageUrls
+      images: imageUrls,
+      supplier: req.user.id
     });
 
     await product.save();
 
     const populatedProduct = await Product.findById(product._id)
-      .populate('category', 'name slug')
       .populate('supplier', 'firstName lastName company');
 
     res.status(201).json({
@@ -202,6 +195,7 @@ router.post('/', [
     res.status(500).json({ message: 'Server error while creating product' });
   }
 });
+
 
 // @route   PUT /api/products/:id
 // @desc    Update a product

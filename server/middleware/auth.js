@@ -6,6 +6,8 @@ const auth = async (req, res, next) => {
     // Try to get token from Authorization header or cookie
     let token = req.header('Authorization')?.replace('Bearer ', '') || 
                 req.cookies?.token;
+    console.log("Token from header or cookie:", token);
+    
 
     if (!token) {
       return res.status(401).json({ message: 'No token, authorization denied' });

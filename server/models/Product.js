@@ -13,8 +13,8 @@ const productSchema = new mongoose.Schema({
     maxlength: [2000, 'Description cannot exceed 2000 characters']
   },
   category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
+    type: String,
+    enum: ['Vegetables', 'Fruits', 'Grains', 'Dairy', 'Meat', 'Seafood', 'Beverages', 'Snacks', 'Condiments', 'Spices'],
     required: [true, 'Category is required']
   },
   supplier: {

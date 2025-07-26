@@ -4,6 +4,9 @@ import Homepage from "./components/Homepage"
 import Signup from "./components/SignUp";
 import Login from "./components/Login";
 import UserProfile from "./components/UserProfile";
+import AddProduct from "./components/AddProduct";
+import AllProducts from "./components/AllProducts";
+import ProductDetails from "./components/ProductDetails";
 
 const appRouter = createBrowserRouter([
     {
@@ -27,6 +30,21 @@ const appRouter = createBrowserRouter([
         {
           path: "/login",
           element: <Login />,
+        },
+
+        {
+          path: "/add-product",
+          element: <AddProduct />,
+        },
+        
+        {
+          path: "/all-products",
+          element: <AllProducts />,
+        },
+
+        {
+          path: "/product/:id",
+          element: <ProductDetails />,
         },
 
         {

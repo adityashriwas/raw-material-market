@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="bg-orange-50 h-[100vh] py-30 px-6 md:px-12 lg:px-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
@@ -12,7 +15,9 @@ const Hero = () => {
           <p className="text-lg text-gray-600">
             From fresh spices to essential ingredients, we supply everything your stall needs to serve delicious street food. Delivered fast and affordably.
           </p>
-          <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition">
+          <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition"
+            onClick={() => navigate('/all-products')}
+          >
             Browse Products
           </button>
         </div>
