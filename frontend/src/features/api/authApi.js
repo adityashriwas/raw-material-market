@@ -9,7 +9,7 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
-        url: "/login",
+        url: "login",
         method: "POST",
         body: credentials,
       }),
@@ -22,21 +22,41 @@ export const authApi = createApi({
         }
       },
     }),
+
     register: builder.mutation({
       query: (userData) => ({
-        url: "/register",
+        url: "register",
         method: "POST",
         body: userData,
       }),
     }),
     logout: builder.mutation({
       query: () => ({
-        url: "/logout",
+        url: "logout",
         method: "POST",
       }),
+    }),
+
+    loadUser: builder.query({
+      query: () => ({
+        url: "getuser",
+        method: "GET",
+      }),
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(userLoggedIn({ user: result.data.user }));
+        } catch (error) {
+          console.log(error);
+        }
+      },
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation } =
-  authApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLogoutMutation,
+  useLoadUserQuery,
+} = authApi;

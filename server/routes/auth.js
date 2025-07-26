@@ -31,7 +31,7 @@ const verifyEmailConfig = async () => {
 };
 
 // Initialize email verification
-verifyEmailConfig();
+// verifyEmailConfig();
 
 // Send verification email
 const sendVerificationEmail = async (user, verificationToken) => {
@@ -122,10 +122,10 @@ router.post('/register', [
     await user.save();
 
     // Generate verification token
-    const verificationToken = generateVerificationToken(user._id);
+    // const verificationToken = generateVerificationToken(user._id);
 
     // Send verification email
-    await sendVerificationEmail(user, verificationToken);
+    // await sendVerificationEmail(user, verificationToken);
 
     // Generate auth token
     const token = generateToken(user._id);
@@ -203,9 +203,9 @@ router.post('/login', [
     }
 
     // Check if email is verified
-    if (!user.isEmailVerified) {
-      return res.status(403).json({ message: 'Please verify your email before logging in' });
-    }
+    // if (!user.isEmailVerified) {
+    //   return res.status(403).json({ message: 'Please verify your email before logging in' });
+    // }
 
     // Check password
     const isMatch = await user.comparePassword(password);
@@ -240,13 +240,27 @@ router.post('/login', [
 // @route   GET /api/auth/me
 // @desc    Get current user
 // @access  Private
-router.get('/me', auth, async (req, res) => {
+router.get('/getuser', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    res.json({ user });
+    const userId = req.id;
+    const user = await User.findById(userId)
+      .select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "Profile not found",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      user,
+    });
   } catch (error) {
-    console.error('Get user error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load user",
+    });
   }
 });
 

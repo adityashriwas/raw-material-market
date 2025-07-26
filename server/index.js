@@ -2,9 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const cookieParser = require("cookie-parser");
 
 // Load environment variables
 dotenv.config();
+
+const app = express();
+
+app.use(cookieParser()); 
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -14,7 +19,6 @@ const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
 const supplierRoutes = require('./routes/suppliers');
 
-const app = express();
 
 // Middleware
 app.use(cors({

@@ -3,6 +3,7 @@ import MainLayout from "./layout/MainLayout"
 import Homepage from "./components/Homepage"
 import Signup from "./components/SignUp";
 import Login from "./components/Login";
+import UserProfile from "./components/UserProfile";
 
 const appRouter = createBrowserRouter([
     {
@@ -27,6 +28,11 @@ const appRouter = createBrowserRouter([
           path: "/login",
           element: <Login />,
         },
+
+        {
+          path: "/profile",
+          element: <UserProfile />,
+        }
       ],
     },
   ],
