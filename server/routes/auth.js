@@ -1,10 +1,59 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const nodemailer = require('nodemailer');
 const User = require('../models/User');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Configure nodemailer transporter
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Verify email configuration
+const verifyEmailConfig = async () => {
+  try {
+    await transporter.verify();
+    console.log('Email configuration is valid');
+    return true;
+  } catch (error) {
+    console.error('Email configuration error:', error);
+    return false;
+  }
+};
+
+// Initialize email verification
+verifyEmailConfig();
+
+// Send verification email
+const sendVerificationEmail = async (user, verificationToken) => {
+  try {
+    const verificationUrl = `${process.env.APP_URL}/verify?token=${verificationToken}`;
+    
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: 'Verify Your Email',
+      html: `
+        <h1>Welcome ${user.firstName}!</h1>
+        <p>Please verify your email address by clicking the link below:</p>
+        <a href="${verificationUrl}">Verify Email</a>
+        <p>This link will expire in 24 hours.</p>
+      `
+    });
+  } catch (error) {
+    console.error('Error sending verification email:', error);
+    throw new Error('Failed to send verification email');
+  }
+};
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -13,6 +62,25 @@ const generateToken = (userId) => {
     process.env.JWT_SECRET || 'fallback_secret',
     { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
+};
+
+// Generate email verification token
+const generateVerificationToken = (userId) => {
+  return jwt.sign(
+    { userId },
+    process.env.JWT_SECRET || 'fallback_secret',
+    { expiresIn: '24h' }
+  );
+};
+
+// Set JWT cookie
+const setTokenCookie = (res, token) => {
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  });
 };
 
 // @route   POST /api/auth/register
@@ -47,28 +115,64 @@ router.post('/register', [
       password,
       role,
       phone,
-      company
+      company,
+      isEmailVerified: false
     });
 
     await user.save();
 
-    // Generate token
+    // Generate verification token
+    const verificationToken = generateVerificationToken(user._id);
+
+    // Send verification email
+    await sendVerificationEmail(user, verificationToken);
+
+    // Generate auth token
     const token = generateToken(user._id);
 
+    // Set token cookie
+    setTokenCookie(res, token);
+
     res.status(201).json({
-      message: 'User registered successfully',
+      message: 'User registered successfully. Please check your email for verification.',
       token,
       user: {
         id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        role: user.role
+        role: user.role,
+        isEmailVerified: user.isEmailVerified
       }
     });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ message: 'Server error during registration' });
+  }
+});
+
+// @route   POST /api/auth/verify-email
+// @desc    Verify user email
+// @access  Public
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+    const user = await User.findByIdAndUpdate(
+      decoded.userId,
+      { isEmailVerified: true },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'Email verified successfully' });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(400).json({ message: 'Invalid or expired verification token' });
   }
 });
 
@@ -98,6 +202,11 @@ router.post('/login', [
       return res.status(403).json({ message: 'Account is deactivated' });
     }
 
+    // Check if email is verified
+    if (!user.isEmailVerified) {
+      return res.status(403).json({ message: 'Please verify your email before logging in' });
+    }
+
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
@@ -107,6 +216,9 @@ router.post('/login', [
     // Generate token
     const token = generateToken(user._id);
 
+    // Set token cookie
+    setTokenCookie(res, token);
+
     res.json({
       message: 'Login successful',
       token,
@@ -115,7 +227,8 @@ router.post('/login', [
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        role: user.role
+        role: user.role,
+        isEmailVerified: user.isEmailVerified
       }
     });
   } catch (error) {

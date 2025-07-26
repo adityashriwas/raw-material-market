@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
   orderNumber: {
     type: String,
-    unique: true,
-    required: true
+    unique: true
+    // required: true is redundant since orderNumber is auto-generated in the pre-save hook.
+    // The pre-save hook ensures it will always have a value before saving.
   },
   buyer: {
     type: mongoose.Schema.Types.ObjectId,
@@ -101,7 +102,11 @@ const orderSchema = new mongoose.Schema({
     default: 'pending'
   },
   statusHistory: [{
-    status: String,
+    status: {
+      type: String,
+      required: true,
+      enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']
+    },
     timestamp: {
       type: Date,
       default: Date.now

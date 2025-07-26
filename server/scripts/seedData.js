@@ -21,11 +21,12 @@ const seedData = async () => {
     // Create admin user
     const adminUser = new User({
       firstName: 'Admin',
-      lastName: 'User',
+      lastName: 'User', 
       email: 'admin@example.com',
-      password: 'admin123',
+      password: await bcrypt.hash('admin123', 10),
       role: 'admin',
-      isVerified: true,
+      isEmailVerified: true,
+      isActive: true
     });
     await adminUser.save();
 
@@ -33,8 +34,8 @@ const seedData = async () => {
     const supplier1 = new User({
       firstName: 'John',
       lastName: 'Smith',
-      email: 'supplier1@example.com',
-      password: 'supplier123',
+      email: 'supplier1@example.com', 
+      password: await bcrypt.hash('supplier123', 10),
       role: 'supplier',
       company: {
         name: 'ChemCorp Industries',
@@ -48,7 +49,9 @@ const seedData = async () => {
         zip: '10001',
         street: '123 Main St',
       },
-      isVerified: true,
+      isEmailVerified: true,
+      isActive: true,
+      phone: '1234567890'
     });
     await supplier1.save();
 
@@ -56,14 +59,16 @@ const seedData = async () => {
       firstName: 'Sarah',
       lastName: 'Johnson',
       email: 'supplier2@example.com',
-      password: 'supplier123',
+      password: await bcrypt.hash('supplier123', 10),
       role: 'supplier',
       company: {
         name: 'MetalWorks Ltd',
         type: 'Metal Supplier',
         website: 'https://metalworks.com',
       },
-      isVerified: true,
+      isEmailVerified: true,
+      isActive: true,
+      phone: '0987654321'
     });
     await supplier2.save();
 
@@ -72,13 +77,15 @@ const seedData = async () => {
       firstName: 'Mike',
       lastName: 'Wilson',
       email: 'buyer@example.com',
-      password: 'buyer123',
+      password: await bcrypt.hash('buyer123', 10),
       role: 'buyer',
       company: {
         name: 'Manufacturing Co',
         type: 'Manufacturer',
       },
-      isVerified: true,
+      isEmailVerified: true,
+      isActive: true,
+      phone: '5555555555'
     });
     await buyer.save();
 
