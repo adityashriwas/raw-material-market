@@ -33,20 +33,48 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    trim: true
+    trim: true,
   },
   address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String
+    street: {
+      type: String,
+      trim: true
+    },
+    city: {
+      type: String,
+      trim: true
+    },
+    state: {
+      type: String,
+      trim: true
+    },
+    zipCode: {
+      type: String,
+      trim: true
+    },
+    country: {
+      type: String,
+      trim: true
+    }
   },
   company: {
-    name: String,
-    type: String,
-    registrationNumber: String,
-    website: String
+    name: {
+      type: String,
+      trim: true
+    },
+    type: {
+      type: String,
+      trim: true
+    },
+    registrationNumber: {
+      type: String,
+      trim: true
+    },
+    website: {
+      type: String,
+      trim: true,
+      match: [/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/, 'Please enter a valid URL']
+    }
   },
   isVerified: {
     type: Boolean,
