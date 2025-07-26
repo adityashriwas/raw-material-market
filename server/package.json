@@ -1,0 +1,27 @@
+{
+  "name": "raw-material-marketplace-server",
+  "version": "1.0.0",
+  "description": "Backend server for raw material marketplace",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node scripts/seedData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express-validator": "^7.0.1",
+    "multer": "^1.4.5-lts.1",
+    "cloudinary": "^1.40.0",
+    "stripe": "^12.18.0",
+    "nodemailer": "^6.9.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
