@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   },
   lastName: {
     type: String,
-    required: [true, 'Last name is required'],
+    required: [true, 'Last name is required'], 
     trim: true,
     maxlength: [50, 'Last name cannot exceed 50 characters']
   },
@@ -76,7 +76,7 @@ const userSchema = new mongoose.Schema({
       match: [/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/, 'Please enter a valid URL']
     }
   },
-  isVerified: {
+  isEmailVerified: {
     type: Boolean,
     default: false
   },
@@ -87,7 +87,12 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: ''
-  }
+  },
+  lastLoginAt: {
+    type: Date
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date
 }, {
   timestamps: true
 });
@@ -110,10 +115,12 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove password from JSON output
+// Remove sensitive fields from JSON output
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;
+  delete userObject.passwordResetToken;
+  delete userObject.passwordResetExpires;
   return userObject;
 };
 

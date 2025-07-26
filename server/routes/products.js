@@ -1,8 +1,25 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const { auth, authorize } = require('../middleware/auth');
+
+// Configure cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 const router = express.Router();
 
@@ -122,10 +139,10 @@ router.get('/:id', async (req, res) => {
 router.post('/', [
   auth,
   authorize('supplier', 'admin'),
+  upload.array('images', 5), // Allow up to 5 images
   body('name').notEmpty().withMessage('Product name is required'),
   body('description').notEmpty().withMessage('Product description is required'),
   body('category').isMongoId().withMessage('Valid category ID is required'),
-  body('images').isArray({ min: 1 }).withMessage('At least one image is required'),
   body('pricing.basePrice').isFloat({ min: 0 }).withMessage('Base price must be a positive number'),
   body('pricing.unit').notEmpty().withMessage('Unit is required'),
   body('pricing.minimumOrderQuantity').isInt({ min: 1 }).withMessage('Minimum order quantity must be at least 1'),
@@ -137,6 +154,26 @@ router.post('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'At least one image is required' });
+    }
+
+    // Upload images to cloudinary
+    const uploadPromises = req.files.map(file => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'products' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          }
+        );
+        stream.end(file.buffer);
+      });
+    });
+
+    const imageUrls = await Promise.all(uploadPromises);
+
     // Verify category exists
     const category = await Category.findById(req.body.category);
     if (!category) {
@@ -146,7 +183,8 @@ router.post('/', [
     // Create product
     const product = new Product({
       ...req.body,
-      supplier: req.user.id
+      supplier: req.user.id,
+      images: imageUrls
     });
 
     await product.save();
@@ -170,6 +208,7 @@ router.post('/', [
 // @access  Private (Product owner or admin)
 router.put('/:id', [
   auth,
+  upload.array('images', 5), // Allow up to 5 new images
   body('name').optional().notEmpty().withMessage('Product name cannot be empty'),
   body('description').optional().notEmpty().withMessage('Product description cannot be empty'),
   body('category').optional().isMongoId().withMessage('Valid category ID is required'),
@@ -198,6 +237,25 @@ router.put('/:id', [
       if (!category) {
         return res.status(400).json({ message: 'Category not found' });
       }
+    }
+
+    // Upload new images if provided
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(file => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: 'products' },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result.secure_url);
+            }
+          );
+          stream.end(file.buffer);
+        });
+      });
+
+      const newImageUrls = await Promise.all(uploadPromises);
+      req.body.images = [...(product.images || []), ...newImageUrls];
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
