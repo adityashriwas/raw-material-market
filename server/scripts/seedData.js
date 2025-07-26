@@ -39,7 +39,14 @@ const seedData = async () => {
       company: {
         name: 'ChemCorp Industries',
         type: 'Chemical Manufacturer',
-        website: 'https://chemcorp.com'
+        website: 'https://chemcorp.com',
+      },
+      address: {
+        country: 'United States',
+        city: 'New York',
+        state: 'NY',
+        zip: '10001',
+        street: '123 Main St',
       },
       isVerified: true,
     });
@@ -54,7 +61,7 @@ const seedData = async () => {
       company: {
         name: 'MetalWorks Ltd',
         type: 'Metal Supplier',
-        website: 'https://metalworks.com'
+        website: 'https://metalworks.com',
       },
       isVerified: true,
     });
@@ -69,7 +76,7 @@ const seedData = async () => {
       role: 'buyer',
       company: {
         name: 'Manufacturing Co',
-        type: 'Manufacturer'
+        type: 'Manufacturer',
       },
       isVerified: true,
     });
