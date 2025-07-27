@@ -18,6 +18,7 @@ export const productApi = createApi({
       query: (product) => ({
         url: "/post-product",
         method: "POST",
+        credentials: "include",
         body: product,
       }),
     }),
@@ -26,6 +27,7 @@ export const productApi = createApi({
       query: ({ id, ...product }) => ({
         url: `/${id}`,
         method: "PUT",
+        credentials: "include",
         body: product,
       }),
     }),
@@ -34,6 +36,7 @@ export const productApi = createApi({
       query: (id) => ({
         url: `/${id}`,
         method: "DELETE",
+        credentials: "include",
       }),
     }),
   }),

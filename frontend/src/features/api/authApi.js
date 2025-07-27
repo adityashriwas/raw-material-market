@@ -11,6 +11,7 @@ export const authApi = createApi({
       query: (credentials) => ({
         url: "login",
         method: "POST",
+        credentials: "include",
         body: credentials,
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
@@ -27,6 +28,7 @@ export const authApi = createApi({
       query: (userData) => ({
         url: "register",
         method: "POST",
+        credentials: "include",
         body: userData,
       }),
     }),
@@ -34,6 +36,7 @@ export const authApi = createApi({
       query: () => ({
         url: "logout",
         method: "POST",
+        credentials: "include"
       }),
     }),
 
@@ -41,6 +44,7 @@ export const authApi = createApi({
       query: () => ({
         url: "getuser",
         method: "GET",
+        credentials: "include"
       }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
