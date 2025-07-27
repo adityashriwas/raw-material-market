@@ -36,8 +36,8 @@ const verifyEmailConfig = async () => {
 // Send verification email
 const sendVerificationEmail = async (user, verificationToken) => {
   try {
-    const verificationUrl = `${process.env.APP_URL}/verify?token=${verificationToken}`;
-    
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify?token=${verificationToken}`;
+
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: user.email,
