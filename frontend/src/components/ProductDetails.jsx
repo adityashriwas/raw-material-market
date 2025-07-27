@@ -97,10 +97,10 @@ export default function ProductDetailPage() {
               )}
             </div>
           )}
-
+{/* 
           <button className="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl text-sm shadow">
             Request Order
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
