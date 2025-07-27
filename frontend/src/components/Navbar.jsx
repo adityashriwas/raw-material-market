@@ -53,8 +53,8 @@ const Navbar = () => {
             </h1>
           </Link>
         </div>
-        {/* User icons and dark mode icon  */}
-        <div className="flex items-center gap-8">
+
+        <div className="flex items-center cursor-pointer gap-8">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -67,7 +67,7 @@ const Navbar = () => {
                 </Avatar>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-56">
+              <DropdownMenuContent className="w-56 cursor-pointer">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -80,20 +80,16 @@ const Navbar = () => {
                     <Link to="/all-products">All Products</Link>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem asChild>
-                    <Link to="/add-product">Add Product</Link>
-                  </DropdownMenuItem>
-
                   <DropdownMenuItem onClick={logoutHandler}>
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
 
-                {user?.role === "vendor" && (
+                {user?.role === "supplier" && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/admin/dashboard">Dashboard</Link>
+                      <Link to="/add-product">Add Product</Link>
                     </DropdownMenuItem>
                   </>
                 )}
@@ -112,7 +108,7 @@ const Navbar = () => {
       {/* Mobile device  */}
       <div className="flex md:hidden items-center justify-between px-4 h-full">
         <div className="flex items-center gap-2">
-          <School size={"30"} />
+          {/* <School size={"30"} /> */}
           <Link to="/">
             <h1 className="md:block font-extrabold text-2xl">Sellium</h1>
           </Link>
@@ -140,7 +136,7 @@ const MobileNavbar = ({ user }) => {
   }, [isSuccess]);
 
   return (
-    <Sheet>
+    <Sheet className="cursor-pointer">
       <SheetTrigger asChild>
         <Button
           size="icon"
@@ -161,7 +157,7 @@ const MobileNavbar = ({ user }) => {
           </SheetClose>
 
           <SheetClose asChild>
-            <Link to="/my-learning">Added Products</Link>
+            <Link to="/all-products">All Products</Link>
           </SheetClose>
 
           <SheetClose asChild>
