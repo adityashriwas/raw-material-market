@@ -13,7 +13,7 @@ A robust Node.js backend API for the Raw Material Marketplace e-commerce platfor
 - **Express Validator** - Input validation and sanitization
 - **Multer** - File upload handling
 - **Cloudinary** - Image storage (optional)
-- **Nodemailer** - Email sending (optional)
+
 
 ## 🚀 Quick Start
 
@@ -44,20 +44,11 @@ A robust Node.js backend API for the Raw Material Marketplace e-commerce platfor
    mongod
    ```
 
-5. **Seed database with sample data**
-   ```bash
-   npm run seed
-   ```
-
-6. **Start development server**
+5. **Start development server**
    ```bash
    npm run dev
    ```
 
-7. **API will be available at**
-   ```
-   http://localhost:5000
-   ```
 
 ## 📁 Project Structure
 
@@ -77,8 +68,6 @@ server/
 │   ├── orders.js          # Order routes
 │   ├── users.js           # User routes
 │   └── suppliers.js       # Supplier routes
-├── scripts/               # Database scripts
-│   └── seedData.js        # Database seeding
 ├── .env.example           # Environment variables template
 ├── index.js               # Main server file
 └── package.json           # Dependencies and scripts
@@ -88,7 +77,7 @@ server/
 
 - `npm start` - Start production server
 - `npm run dev` - Start development server with nodemon
-- `npm run seed` - Seed database with sample data
+
 
 ## 🌐 API Endpoints
 
@@ -214,61 +203,6 @@ router.post('/supplier-only', [auth, authorize('supplier', 'admin')], handler);
   statusHistory: [Object]
 }
 ```
-
-## ⚙️ Environment Configuration
-
-Create a `.env` file with the following variables:
-
-```env
-# Server Configuration
-NODE_ENV=development
-PORT=5000
-
-# Database
-MONGODB_URI=mongodb://localhost:27017/raw-material-marketplace
-
-# JWT
-JWT_SECRET=your_jwt_secret_key_here
-JWT_EXPIRE=7d
-
-# Optional: Cloudinary (for image uploads)
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
-# Optional: Stripe (for payments)
-STRIPE_SECRET_KEY=your_stripe_secret_key
-STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-
-# Optional: Email (for notifications)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_email_password
-```
-
-## 📊 Sample Data
-
-Run the seed script to populate the database:
-```bash
-npm run seed
-```
-
-This creates:
-- 1 Admin user
-- 2 Supplier users
-- 1 Buyer user
-- 4 Product categories
-- 5 Sample products
-
-### Test Accounts
-```
-Admin: admin@example.com / admin123
-Supplier 1: supplier1@example.com / supplier123
-Supplier 2: supplier2@example.com / supplier123
-Buyer: buyer@example.com / buyer123
-```
-
 ## 🔍 API Features
 
 ### Advanced Product Filtering
@@ -279,11 +213,6 @@ GET /api/products?category=<id>&minPrice=100&maxPrice=1000&search=aluminum&sortB
 ### Pagination
 ```
 GET /api/products?page=2&limit=20
-```
-
-### Search
-```
-GET /api/products?search=chemical
 ```
 
 ## 🛡️ Security Features
