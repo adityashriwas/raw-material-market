@@ -1,164 +1,219 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRegisterMutation } from "../features/api/authApi";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const Signup = () => {
-  const navigate = useNavigate(); 
-  const [signupInput, setSignupInput] = useState({
+const SignUp = () => {
+  const navigate = useNavigate();
+  const [register, { isLoading }] = useRegisterMutation();
+
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
-    role: "",
-  });
-
-  const roles = [
-    { id: "buyer", label: "Buyer" },
-    { id: "supplier", label: "Supplier" },
-  ];
-
-  const [
-    registerUser,
-    {
-      data: registerData,
-      error: registerError,
-      isLoading: registerIsLoading,
-      isSuccess: registerIsSuccess,
+    phone: "",
+    role: "buyer",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
     },
-  ] = useRegisterMutation();
+    company: {
+      name: "",
+      type: "",
+      registrationNumber: "",
+      website: "",
+    },
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSignupInput((prev) => ({ ...prev, [name]: value }));
+    if (name.startsWith("address.")) {
+      const key = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        address: { ...prev.address, [key]: value },
+      }));
+    } else if (name.startsWith("company.")) {
+      const key = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        company: { ...prev.company, [key]: value },
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleRegistration = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await registerUser(signupInput).unwrap();
+      const { data, error } = await register(formData);
+      if (error) throw error;
+      toast.success("Registration successful!");
+      navigate("/login");
     } catch (err) {
-      console.error("Error from registerUser:", err);
+      toast.error(err?.data?.message || "Registration failed.");
     }
   };
 
-  useEffect(() => {
-    if (registerIsSuccess && registerData) {
-      toast.success(registerData.message || "Signup successful.");
-      navigate("/profile");
-    }
-    if (registerError) {
-      toast.error(registerError?.data?.message || "Signup Failed");
-    }
-  }, [registerIsSuccess, registerError, registerData]);
-
   return (
-    <section className="min-h-screen flex items-center justify-center bg-orange-50 px-6">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
-          Create New Account
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-orange-50 px-4 py-10">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-md space-y-6"
+      >
+        <h2 className="text-2xl font-bold text-center text-orange-600">Create Your Account</h2>
 
-        <form className="space-y-5" onSubmit={handleRegistration}>
-          <div>
-            <label className="block text-sm text-gray-600">First Name</label>
+        {/* Basic Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            name="firstName"
+            placeholder="First Name *"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+            className="input"
+          />
+          <input
+            name="lastName"
+            placeholder="Last Name *"
+            value={formData.lastName}
+            onChange={handleChange}
+            required
+            className="input"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email *"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="input"
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password *"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="input"
+          />
+          <input
+            name="phone"
+            placeholder="Phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="input"
+          />
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="input"
+          >
+            <option value="buyer">Buyer</option>
+            <option value="supplier">Supplier</option>
+          </select>
+        </div>
+
+        {/* Address Info */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Address (Optional)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
-              type="text"
-              name="firstName"
-              value={signupInput.firstName}
+              name="address.street"
+              placeholder="Street"
+              value={formData.address.street}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
-              placeholder="Your First Name"
-              required
+              className="input"
+            />
+            <input
+              name="address.city"
+              placeholder="City"
+              value={formData.address.city}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              name="address.state"
+              placeholder="State"
+              value={formData.address.state}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              name="address.zipCode"
+              placeholder="Zip Code"
+              value={formData.address.zipCode}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              name="address.country"
+              placeholder="Country"
+              value={formData.address.country}
+              onChange={handleChange}
+              className="input"
             />
           </div>
+        </div>
 
+        {/* Company Info (Supplier Only) */}
+        {formData.role === "supplier" && (
           <div>
-            <label className="block text-sm text-gray-600">Last Name</label>
-            <input
-              type="text"
-              name="lastName"
-              value={signupInput.lastName}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
-              placeholder="Your Last Name"
-              required
-            />
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Company Info</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                name="company.name"
+                placeholder="Company Name"
+                value={formData.company.name}
+                onChange={handleChange}
+                className="input"
+              />
+              <input
+                name="company.type"
+                placeholder="Company Type"
+                value={formData.company.type}
+                onChange={handleChange}
+                className="input"
+              />
+              <input
+                name="company.registrationNumber"
+                placeholder="Registration Number"
+                value={formData.company.registrationNumber}
+                onChange={handleChange}
+                className="input"
+              />
+              <input
+                name="company.website"
+                placeholder="Website URL"
+                value={formData.company.website}
+                onChange={handleChange}
+                className="input"
+              />
+            </div>
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm text-gray-600">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={signupInput.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-600">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={signupInput.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
-              placeholder="Choose a strong password"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-600">User Role</label>
-            <select
-              name="role"
-              value={signupInput.role}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
-            >
-              <option value="">Select Role</option>
-              {roles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
+        {/* Submit */}
+        <div className="text-center">
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white py-2 rounded-xl font-semibold hover:bg-orange-600 transition"
-            disabled={registerIsLoading}
+            disabled={isLoading}
+            className="w-full md:w-1/3 px-4 py-2 rounded bg-orange-600 text-white font-semibold hover:bg-orange-700 transition duration-200"
           >
-            {registerIsLoading ? (
-              <div className="flex justify-center items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Please wait
-              </div>
-            ) : (
-              "Signup"
-            )}
+            {isLoading ? "Registering..." : "Register"}
           </button>
-
-          <p className="text-center text-sm mt-4">
-            Already Registered?{" "}
-            <a
-              href="/login"
-              className="text-orange-500 font-medium hover:underline"
-            >
-              Login here
-            </a>
-          </p>
-        </form>
-      </div>
-    </section>
+        </div>
+      </form>
+    </div>
   );
 };
 
-export default Signup;
+export default SignUp;

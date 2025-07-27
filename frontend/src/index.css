@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/* Add to global styles (e.g., index.css or tailwind.css) */
+.input {
+  @apply px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500;
+}

@@ -73,6 +73,20 @@ const AddProduct = () => {
     try {
       const res = await createProduct(submission).unwrap();
       toast.success(res.message || "Product created!");
+      setFormData({
+        name: "",
+        description: "",
+        category: "",
+        pricing: {
+          basePrice: "",
+          unit: "",
+          minimumOrderQuantity: "",
+        },
+        inventory: {
+          quantity: "",
+        },
+        images: [],
+      });
     } catch (err) {
       toast.error(err?.data?.message || "Something went wrong");
     }

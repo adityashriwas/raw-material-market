@@ -289,4 +289,9 @@ router.put('/profile', auth, [
   }
 });
 
+router.post('/logout', auth, (req, res) => {
+  res.clearCookie('token');
+  res.json({ message: 'User logged out successfully' });
+});
+
 module.exports = router;
