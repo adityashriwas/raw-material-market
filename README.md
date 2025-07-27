@@ -24,12 +24,11 @@ raw-material-market/
 ### 🎨 Frontend Application (client/)
 - **Technology**: React 18 with Material-UI
 - **Features**: Modern e-commerce interface with product catalog, shopping cart, user authentication
-- **Port**: http://localhost:3000
+
 
 ### 🔧 Backend Application (server/)
 - **Technology**: Node.js with Express.js
 - **Features**: REST API with authentication, product management, order processing
-- **Port**: http://localhost:5000
 
 ## Quick Start
 
@@ -69,20 +68,6 @@ raw-material-market/
    npm start
    ```
 
-### Access the Application
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000/api
-
-## Test Accounts
-
-After running the seed script:
-
-```
-Admin: admin@example.com / admin123
-Supplier: supplier1@example.com / supplier123
-Buyer: buyer@example.com / buyer123
-```
-
 ## Key Features
 
 - ✅ **User Authentication** - Role-based access (Buyers, Suppliers, Admins)
@@ -101,8 +86,8 @@ Buyer: buyer@example.com / buyer123
 ## Documentation
 
 For detailed setup and usage instructions:
-- See `client/README.md` for frontend documentation
 - See `server/README.md` for backend API documentation
+- See `README.md` for overall website documentation
 
 ## Contributing
 
