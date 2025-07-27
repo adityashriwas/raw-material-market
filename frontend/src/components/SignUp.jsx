@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useRegisterMutation } from "../features/api/authApi";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const navigate = useNavigate(); 
   const [signupInput, setSignupInput] = useState({
     firstName: "",
     lastName: "",
